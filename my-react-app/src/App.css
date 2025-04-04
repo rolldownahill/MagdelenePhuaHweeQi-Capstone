@@ -2,13 +2,16 @@ body {
   background-color: #f5f7fa; /* Light blue-gray background */
   margin: 0;
   min-height: 100vh; /* Ensures full page coverage */
+  display: flex;
+  justify-content: center; /* Centers everything horizontally */
+  align-items: center; /* Centers everything vertically */
 }
 
 #root {
-  max-width: 1280px;
-    /* Centers container */
-  padding: 5rem 2rem 16rem 12rem; /* Extra left padding (top, right, bottom, left) */
-  text-align: left;     /* Left-aligns all text */
+  max-width: 800px; /* Adjust as needed */
+  width: 100%;
+  padding: 5rem 2rem 16rem 2rem; /* Keeps even spacing */
+  text-align: left; /* Keeps text aligned properly */
 }
 
 .title h1 {
@@ -23,26 +26,23 @@ body {
   gap: 1rem;
   align-items: center;
   margin-bottom: 2rem;
-  
 }
 
-/* Keep your existing .my-input styles */
 .my-input {
   height: 25px;
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  min-width: 120px; /* Minimum width before wrapping */
-  flex: 1; /* Grow to fill available space */
-  max-width: 200px; /* Maximum width */
+  min-width: 120px; 
+  flex: 1; 
+  max-width: 200px; 
 }
 
 #addStockButton {
-  margin-left: auto; /* Pushes button to right when in same row */
-  flex: 0 0 auto;  /* This pushes the container (and its button) to the right */
+  margin-left: auto; 
+  flex: 0 0 auto;  
 }
 
-/* Button styling (keep your existing styles) */
 #addStockButton button {
   height: 40px;
   min-width: 120px;
@@ -56,5 +56,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Remove margin-left: auto from here */
+}
+
+.stock-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ensures the stock card is fully responsive */
+  max-width: 400px;
+  margin: 10px 0; /* Adjusted margin for better alignment */
+  text-align: left; /* Ensure text is aligned left */
+}
+
+.profit-loss {
+  font-weight: bold;
+  text-align: left; /* Aligns profit-loss text the same as other text */
 }
