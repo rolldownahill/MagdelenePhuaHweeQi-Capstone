@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   TextField,
   Button,
@@ -11,32 +11,38 @@ import {
   ListItemText,
 } from '@mui/material';
 import './App.css';
-import { useStocks } from './stockContext'; // Import the custom hook
+import { useStocks } from './stockContext'; // Custom context hook
 
 function App() {
   const [stockSymbol, setStockSymbol] = useState('');
   const [quantity, setQuantity] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
+  const { stocks, addStock } = useStocks();
 
-  const { stocks, addStock, removeStock } = useStocks(); // Destructure from context
-
-  useEffect(() => {
-    console.log('Stocks have been updated:', stocks);
-  }, [stocks]);
-
-  const fetchIBMPrice = async () => {
+  // 🧠 useCallback: fetch real-time stock price (only supports IBM with demo key)
+  const fetchStockPrice = useCallback(async (symbol) => {
     try {
-      const response = await fetch(
-        'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=demo'
+      if (symbol.toUpperCase() !== 'IBM') {
+        return 69; // Fallback placeholder price
+      }
+
+      const res = await fetch(
+        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=demo`
       );
-      const data = await response.json();
-      const price = data['Global Quote']['05. price'];
-      return Number(price);
-    } catch (error) {
-      console.error('Error fetching IBM price:', error);
-      return 69; // fallback price
+      const data = await res.json();
+      const price = data['Global Quote']?.['05. price'];
+
+      return price ? Number(price) : 69; // fallback to 69 if response is weird
+    } catch (err) {
+      console.error('API fetch failed:', err);
+      return 69;
     }
-  };
+  }, []);
+
+  // 🌀 useEffect: debug stock changes
+  useEffect(() => {
+    console.log('📈 Stocks updated:', stocks);
+  }, [stocks]);
 
   const handleAddStock = async () => {
     if (!stockSymbol || !quantity || !purchasePrice) {
@@ -44,14 +50,10 @@ function App() {
       return;
     }
 
-    let currentPrice = 69;
-
-    if (stockSymbol.toUpperCase() === 'IBM') {
-      currentPrice = await fetchIBMPrice();
-    }
+    const currentPrice = await fetchStockPrice(stockSymbol);
 
     const newStock = {
-      stockSymbol,
+      stockSymbol: stockSymbol.toUpperCase(),
       quantity: Number(quantity),
       purchasePrice: Number(purchasePrice),
       currentPrice,
@@ -65,6 +67,7 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
@@ -87,7 +90,6 @@ function App() {
             className="profile-picture"
           />
         </div>
-
         <List>
           {['Home', 'Account', 'Dashboard'].map((text) => (
             <ListItem button key={text}>
@@ -97,15 +99,16 @@ function App() {
         </List>
       </Drawer>
 
+      {/* Main Content */}
       <div className="content">
-      <div className="welcome-banner">
+        {/* Banner */}
+        <div className="welcome-banner">
           <img
             src="https://hips.hearstapps.com/hmg-prod/images/maxresdefault-1588953454.jpg?crop=0.889xw:1.00xh;0.0901xw,0&resize=1200:*"
             alt="Welcome Banner"
             className="banner-img"
           />
         </div>
-        
 
         <div className="header">
           <h1>Finance Dashboard</h1>
@@ -125,10 +128,7 @@ function App() {
             inputProps={{ min: 0 }}
             variant="outlined"
             value={quantity}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value >= 0) setQuantity(value);
-            }}
+            onChange={(e) => setQuantity(e.target.value)}
             size="small"
           />
           <TextField
